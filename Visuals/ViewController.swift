@@ -21,12 +21,13 @@ class ViewController: UIViewController {
 	var array: [UIImageView] = []
 	var n: Int = 6
 	var j: Int = 0
-	var nS: Int = 6
+	var nS: Int = 0
 	var jS: Int = 0
-	var cS: Int = 0
+	var min: Int = 0
 	var flag: Bool = true
 	var checker: Int = 6
 	var swapChekcer : Int = 0
+	var selectionChecker: Bool = false
 	var timer: Timer!
 	
 	
@@ -41,6 +42,7 @@ class ViewController: UIViewController {
 		array.append(imageSeven)
 		scramble()
 		scramble()
+		min = nS
 		
 	
 	}
@@ -52,11 +54,11 @@ class ViewController: UIViewController {
 		
 		if sender.tag == 10{
 			bubbleStep()
-			timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(bubbleStep), userInfo: nil, repeats: true)
+			timer = Timer.scheduledTimer(timeInterval: 0.6, target: self, selector: #selector(bubbleStep), userInfo: nil, repeats: true)
 		}
 		else if sender.tag == 20 {
 			selectionStep()
-			timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(selectionStep), userInfo: nil, repeats: true)
+			timer = Timer.scheduledTimer(timeInterval: 0.6, target: self, selector: #selector(selectionStep), userInfo: nil, repeats: true)
 		}
 		
 	}
@@ -66,12 +68,19 @@ class ViewController: UIViewController {
 		timer.invalidate()
 		scramble()
 		j = 0
+		nS = 0
+		jS = 0
+		min = nS
 		color()
 		flag = true
+		selectionChecker = false
 	}
 	func color() {
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+
 		for c in 0 ... 6 {
-			array[c].backgroundColor = UIColor.white
+			self.array[c].backgroundColor = UIColor.white
+		}
 		}
 	}
 	func recolor(_ r1: Int, _ r2: Int) {
@@ -82,7 +91,10 @@ class ViewController: UIViewController {
 	}
 	
 	@IBAction func Button(_ sender: UIButton) {
-		
+		j = 0
+		color()
+		flag = true
+		selectionChecker = false
 		if sender.tag == 30 {
 			scramble()
 		}
@@ -104,7 +116,7 @@ class ViewController: UIViewController {
 		
 		
 	}
-	func swap(s1:Int,s2:Int) {
+	func swap(s1:Int, s2:Int) {
 		var temp: UIImageView
 		temp = array[s1]
 		array[s1]=array[s2]
@@ -125,7 +137,7 @@ class ViewController: UIViewController {
 			if (array[j].tag > array[j+1].tag){
 				swap(s1: j, s2: j+1)
 				swapChekcer = swapChekcer + 1
-				
+				recolor(j,j+1)
 			}
 			recolor(j,j+1)
 			j = j + 1
@@ -150,21 +162,24 @@ class ViewController: UIViewController {
 	
 	@objc func selectionStep() {
 		color()
-		if jS <= nS{
-			var min: Int = jS
+		if selectionChecker != true {
 			print(jS,nS,min, separator: "...")
-			for n1 in 0 ... 6 {
-				print(array[n1].tag, terminator:"||")
-			}
 			if (array[jS+1].tag < array[min].tag) {
 				//swap(s1: min, s2: jS+1)
 				min = jS + 1
-				
 			}
 			recolor(min,jS+1)
 			jS = jS + 1
 			if (jS == 6) {
-				jS = 0
+				swap(s1:min, s2: nS)
+				nS = nS + 1
+				min = nS
+				jS = nS
+				if nS == 6 {
+					selectionChecker = true
+					
+				}
+				
 				
 			}
 		
