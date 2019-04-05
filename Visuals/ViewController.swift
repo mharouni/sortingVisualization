@@ -20,7 +20,16 @@ class ViewController: UIViewController {
 	var loc :CGPoint = CGPoint(x: 0.0, y: 0.0)
 	var array: [UIImageView] = []
 	var n: Int = 6
-	var j :Int = 0
+	var j: Int = 0
+	var nS: Int = 6
+	var jS: Int = 0
+	var cS: Int = 0
+	var flag: Bool = true
+	var checker: Int = 6
+	var swapChekcer : Int = 0
+	var timer: Timer!
+	
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		array.append(imageOne)
@@ -31,45 +40,56 @@ class ViewController: UIViewController {
 		array.append(imageSix)
 		array.append(imageSeven)
 		scramble()
+		scramble()
+		
 	
+	}
+	
+	
+	
+	
+	@IBAction func buttondown(_ sender: UIButton) {
+		
+		if sender.tag == 10{
+			bubbleStep()
+			timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(bubbleStep), userInfo: nil, repeats: true)
+		}
+		else if sender.tag == 20 {
+			selectionStep()
+			timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(selectionStep), userInfo: nil, repeats: true)
+		}
+		
+	}
+	
+	
+	@IBAction func buttonup(_ sender: UIButton) {
+		timer.invalidate()
+		scramble()
+		j = 0
+		color()
+		flag = true
+	}
+	func color() {
+		for c in 0 ... 6 {
+			array[c].backgroundColor = UIColor.white
+		}
+	}
+	func recolor(_ r1: Int, _ r2: Int) {
+	DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+	self.array[r1].backgroundColor = UIColor.blue
+	self.array[r2].backgroundColor = UIColor.blue
+	}
 	}
 	
 	@IBAction func Button(_ sender: UIButton) {
 		
-		if sender.tag == 10{
-				if j <= n {
-					print(array[j].tag, array[j+1].tag, separator: "...")
-					if (array[j].tag > array[j+1].tag){
-						swapBubble()
-						}
-					j = j + 1
-					}
-			if (j == n){
-				j = 0
-			}
-				}
-		else if sender.tag == 30 {
+		if sender.tag == 30 {
 			scramble()
-
+		}
+		else if sender.tag == 40 {
+			reverse()
 		}
 
-			}
-	
-	
-	
-	
-	func swapBubble(){
-		var temp: UIImageView
-		temp = array[j]
-		array[j]=array[j+1]
-		array[j+1] = temp
-		loc = array[j+1].center
-		array[j+1].center = array[j].center
-		array[j+1].setNeedsDisplay()
-		array[j].center = loc
-		
-		
-		
 	}
 	
 	
@@ -95,11 +115,72 @@ class ViewController: UIViewController {
 		array[s1].center = loc
 	}
 	
+	@objc func bubbleStep(){
+		color()
+		if flag == true {
+			checker = checker + 1
+		if j <= n {
+
+			print(array[j].tag, array[j+1].tag, separator: "...")
+			if (array[j].tag > array[j+1].tag){
+				swap(s1: j, s2: j+1)
+				swapChekcer = swapChekcer + 1
+				
+			}
+			recolor(j,j+1)
+			j = j + 1
+		}
+			if (j == n){
+			j = 0
+			}
+			if checker % 6 == 0{
+				checker = 0
+				if swapChekcer == 0{
+					flag = false
+				}
+				swapChekcer = 0
+				
+			}
+			
+		}
+		else {
+			print("Done")
+		}
+	}
 	
+	@objc func selectionStep() {
+		color()
+		if jS <= nS{
+			var min: Int = jS
+			print(jS,nS,min, separator: "...")
+			for n1 in 0 ... 6 {
+				print(array[n1].tag, terminator:"||")
+			}
+			if (array[jS+1].tag < array[min].tag) {
+				//swap(s1: min, s2: jS+1)
+				min = jS + 1
+				
+			}
+			recolor(min,jS+1)
+			jS = jS + 1
+			if (jS == 6) {
+				jS = 0
+				
+			}
+		
+		}
+		
+	}
 	
-	
-	
-	
+	func reverse() {
+		for k in (1 ... 6).reversed() {
+			for z in 0 ... k-1 {
+				if array[z].tag < array[z+1].tag {
+					swap(s1: z, s2: z+1)
+				}
+			}
+		}
+	}
 		
 	}
 	
